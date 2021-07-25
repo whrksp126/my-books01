@@ -38,3 +38,39 @@ rootSaga.ts (rootSaga를 정의해둠)
 redux 폴더 안에는 creacte.ts (스토리를 만들기 위해)
 
 store설정 끝
+
+
+-------------------------------------
+signin 화면을 만들기 위해 디자인 라이브러리를 가져온다
+
+npm i antd
+npm i @antd-design/icons
+
+-------------------------
+레이아웃 구성이 끝나면
+작업한 ul 에 uncontrolled component 로 input 두개를 ref 삼고
+해당 ref 에서 값을 꺼낸 다음 signin botton 을 클릭하면 
+login api 를 칠수 있도록 한다
+
+login 을 요청하기 위해서 container 에서 login 이라고 하는
+porps 로 함수를 찔러 넣고 이 component에서 그 login 함수를
+호출 하도록 하겠습니다
+
+------------------------
+signin container 에서 login 이라고 하는 함수를 만들어서
+signin component 로 넣어주도록 함
+
+-------------------------------
+
+api 를 호출하는 코드를 추상화 해서 적어둘 것입니다.
+api 는 axios 로 칠 것 이기 때문에
+
+npm i axios
+
+----
+기존에 login 되어 있는 token value 을 보내서 
+ueser api url에 delete 를 해야함
+
+---------------
+api 를 호출해서 redux store 에 token 으로 저장하는거 말고
+브라우저 로컬 스토리지에 저장하는거 까지 처리하겠습니다.

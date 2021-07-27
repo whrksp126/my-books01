@@ -2,19 +2,12 @@
 
 // auth를 작성하는 로직
 
-import { Action, AnyAction } from "redux";
-import { createActions, handleActions } from "redux-actions";
-import { call, put, takeEvery } from "redux-saga/effects";
+import { call, put, select, takeEvery } from "redux-saga/effects";
+import { push } from "connected-react-router";
+import { Action, createActions, handleActions } from "redux-actions";
+import TokenService from "../../services/TokenService";
 import UserService from "../../services/UserService";
-import { LoginReqType } from "../../types";
-
-// Auth의 state를 구상해봐야함
-interface AuthState {
-  // AuthState의 type을 작성함
-  token: string | null;
-  loading: boolean;
-  error: Error | null;
-}
+import { AuthState, LoginReqType } from "../../types";
 
 const initialState: AuthState = {
   // 초기값 지정
@@ -86,7 +79,7 @@ export const { login, logout } = createActions("LOGIN", "LOGOUT", { prefix });
 //              그래서 ↓↓ action은 action 이라는
 // type 이고, 그 안에 제네릭으로 payload 를
 // 지정해주면 됨
-function* loginSaga(action: LoginSagaAction) {
+function* loginSaga(action: Action<LoginReqType>) {
   // 비동기 로직
   try {
     yield put(pending());
@@ -96,13 +89,20 @@ function* loginSaga(action: LoginSagaAction) {
     // 같이 들어오게 되니까 api 로직을 불리해서
     // user 서비스 로직으로 별도로 만들어서 가져오도록 한다
     const token: string = yield call(UserService.login, action.payload);
+
+    // localstorage
+    TokenService.set(token);
     // 받아온 token 을 localstorage 에 넣어야 함
     // 동시에 redux 의 state 로도 세팅을 해주어야 함
-    // localstorage
+
     yield put(success(token));
+    // push 가 처리 되어야 함,
+    // connexted-react-router 를 사용하도록 합니다.
+    // 로그인이 성공적으로 되면 페이지가 root 로 이동합니다.
+    yield put(push("/"));
+
     // 그리고 로그인이 정상적으로 되면 그 다음에 signin page 에서
     // list page 로 이동시켜야 함
-    // push 가 처리 되어야 함
   } catch (error) {
     // 만약에 문제가 있어 error 가 통과하면
     // 그냥 error 객체를 바로 넣지 말고 new error 를 생성하면서
@@ -113,7 +113,18 @@ function* loginSaga(action: LoginSagaAction) {
 }
 
 // logout 이라고 하는 액션이 디스페치 되면 logputSaga가 실행 됨
-function* logoutSaga() {}
+function* logoutSaga() {
+  try {
+    yield put(pending());
+    const token: string = yield select((state) => state.auth.token);
+    yield call(UserService.logout, token);
+    TokenService.set(token);
+  } catch (error) {
+  } finally {
+    TokenService.remove();
+    yield put(success(null));
+  }
+}
 
 export function* authSaga() {
   // auth에서 사이드 이펙이 일어나는 로직들을 작성함
@@ -122,8 +133,4 @@ export function* authSaga() {
   yield takeEvery(`${prefix}/LOGIN`, loginSaga);
   // logout type 이 dspath 되면 logoutSaga가 발동함
   yield takeEvery(`${prefix}/LOGOUT`, logoutSaga);
-}
-
-interface LoginSagaAction extends AnyAction {
-  payload: LoginReqType;
 }

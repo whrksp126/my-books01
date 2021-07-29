@@ -79,11 +79,8 @@ const Signin: React.FC<SigninProps> = ({ login }) => {
   );
 
   function click() {
-    // 이메일과 페스워드 값을 ref에서 꺼내온다
-    //                            ↓↓ 넌넌 어센션을 해서 타입에러를 방지함
-    const email = emailRef.current?.state.value;
-    // 하면 null 혹은 input 이 나올텐데 useRef 를 사용하고 있으니 input 만 나올것이다
-    const password = passwordRef.current?.state.value;
+    const email = emailRef.current!.state.value;
+    const password = passwordRef.current!.state.value;
 
     login({ email, password });
   }

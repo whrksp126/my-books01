@@ -92,9 +92,6 @@ function* logoutSaga() {
 }
 
 export function* authSaga() {
-  // auth에서 사이드 이펙이 일어나는 로직들을 작성함
-  //                액션 타입 ↓↓       ↓↓  Saga 함수
   yield takeEvery(`${prefix}/LOGIN`, loginSaga);
-  // logout type 이 dspath 되면 logoutSaga가 발동함
   yield takeEvery(`${prefix}/LOGOUT`, logoutSaga);
 }

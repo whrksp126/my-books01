@@ -1,26 +1,31 @@
-import { Button, PageHeader, Table } from "antd";
 import { useEffect } from "react";
-import { BookType } from "../types";
-import Layout from "./Layout";
-import Book from "./Book";
-import styles from "./List.module.css";
+import { Button, PageHeader, Table } from "antd";
 
-interface ListProps {
-  books: BookType[] | null;
-  loading: boolean;
+import styles from "./List.module.css";
+import Layout from "./Layout";
+import { BookResType } from "../types";
+import Book from "./Book";
+
+interface BooksProps {
+  books: BookResType[] | null;
   error: Error | null;
+  loading: boolean;
   getBooks: () => void;
-  logout: () => void;
+  deleteBook: (bookId: number) => void;
   goAdd: () => void;
+  goEdit: (bookId: number) => void;
+  logout: () => void;
 }
 
-const List: React.FC<ListProps> = ({
+const Books: React.FC<BooksProps> = ({
   books,
-  loading,
   getBooks,
   error,
-  logout,
+  loading,
+  deleteBook,
   goAdd,
+  logout,
+  goEdit,
 }) => {
   useEffect(() => {
     getBooks();
@@ -55,6 +60,7 @@ const List: React.FC<ListProps> = ({
           </Button>,
         ]}
       />
+      <img src="/bg_list.png" style={{ width: "100%" }} alt="books" />
       <Table
         dataSource={books || []}
         columns={[
@@ -62,17 +68,24 @@ const List: React.FC<ListProps> = ({
             title: "Book",
             dataIndex: "book",
             key: "book",
-            render: (text, record) => <Book {...record} />,
+            render: (text, record) => (
+              <Book
+                {...record}
+                deleteBook={deleteBook}
+                goEdit={goEdit}
+                key={record.bookId}
+              />
+            ),
           },
         ]}
         loading={books === null || loading}
         showHeader={false}
+        className={styles.table}
         rowKey="bookId"
         pagination={false}
-        className={styles.table}
       />
     </Layout>
   );
 };
 
-export default List;
+export default Books;

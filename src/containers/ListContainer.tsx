@@ -1,13 +1,18 @@
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import List from "../components/List";
-import { BookType, RootState } from "../types";
-import { getBooks as getBooksSagaStart } from "../redux/modules/books";
-import { logout as logoutSagaStart } from "../redux/modules/auth";
 import { push } from "connected-react-router";
 
-export default function ListContainer() {
-  const books = useSelector<RootState, BookType[] | null>(
+import List from "../components/List";
+import { RootState } from "../redux/modules/rootReducer";
+import { BookResType } from "../types";
+import { logout as logoutSaga } from "../redux/modules/auth";
+import {
+  getBooks as getBooksSaga,
+  deleteBook as deleteBookSaga,
+} from "../redux/modules/books";
+
+const ListContainer: React.FC = (props) => {
+  const books = useSelector<RootState, BookResType[] | null>(
     (state) => state.books.books
   );
   const loading = useSelector<RootState, boolean>(
@@ -20,25 +25,44 @@ export default function ListContainer() {
   const dispatch = useDispatch;
 
   const getBooks = useCallback(() => {
-    // dispatch(getBooksSagaStart());
+    dispatch(getBooksSaga());
   }, [dispatch]);
 
   const logout = useCallback(() => {
-    // dispatch(logoutSagaStart());
+    dispatch(logoutSaga());
   }, [dispatch]);
 
   const goAdd = useCallback(() => {
-    // dispatch(push("/add"));
+    dispatch(push("/add"));
   }, [dispatch]);
+
+  const deleteBook = useCallback(
+    (bookId) => {
+      dispatch(deleteBookSaga(bookId));
+    },
+    [dispatch]
+  );
+
+  const goEdit = useCallback(
+    (bookId: number) => {
+      dispatch(push(`/edit/${bookId}`));
+    },
+    [dispatch]
+  );
 
   return (
     <List
+      {...props}
       books={books}
       loading={loading}
-      getBooks={getBooks}
       error={error}
-      logout={logout}
+      getBooks={getBooks}
+      deleteBook={deleteBook}
       goAdd={goAdd}
+      goEdit={goEdit}
+      logout={logout}
     />
   );
-}
+};
+
+export default ListContainer;

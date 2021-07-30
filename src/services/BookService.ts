@@ -1,13 +1,14 @@
 import axios from "axios";
-import { BookReqType, BookType } from "../types";
+
+import { BookReqType, BookResType } from "../types";
 
 const BOOK_API_URL = "https://api.marktube.tv/v1/book";
 
 export default class BookService {
-  public static async getBooks(token: string): Promise<BookType[]> {
-    const response = await axios.get(BOOK_API_URL, {
+  public static async getBooks(token: string): Promise<BookResType[]> {
+    const response = await axios.get<BookResType[]>(BOOK_API_URL, {
       headers: {
-        Authoriaztion: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return response.data;
@@ -16,12 +17,37 @@ export default class BookService {
   public static async addBook(
     token: string,
     book: BookReqType
-  ): Promise<BookType> {
-    const response = await axios.post(BOOK_API_URL, book, {
+  ): Promise<BookResType> {
+    const response = await axios.post<BookResType>(BOOK_API_URL, book, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     return response.data;
+  }
+
+  public static async editBook(
+    token: string,
+    bookId: number,
+    book: BookReqType
+  ): Promise<BookResType> {
+    const response = await axios.patch<BookResType>(
+      `${BOOK_API_URL}/${bookId}`,
+      book,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  }
+
+  public static async deleteBook(token: string, bookId: number): Promise<void> {
+    await axios.delete(`${BOOK_API_URL}/${bookId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   }
 }

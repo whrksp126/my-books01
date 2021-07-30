@@ -1,35 +1,35 @@
-import React, { useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { message as messageDialog, PageHeader, Input, Button } from "antd";
 import TextArea from "antd/lib/input/TextArea";
 import { FormOutlined } from "@ant-design/icons";
 
 import Layout from "./Layout";
 import { BookReqType, BookResType } from "../types";
-import styles from "./Add.module.css";
+import styles from "./Edit.module.css";
 
-interface AddProps {
-  books: BookResType[] | null;
+interface EditProps {
+  book: BookResType | undefined | null;
   loading: boolean;
   error: Error | null;
-  add: (book: BookReqType) => void;
+  edit: (book: BookReqType) => void;
   back: () => void;
   getBooks: () => void;
   logout: () => void;
 }
 
-const Add: React.FC<AddProps> = ({
-  books,
+const Edit: React.FC<EditProps> = ({
+  book,
   loading,
   error,
-  add,
+  edit,
   getBooks,
   back,
   logout,
 }) => {
-  const titleRef = React.useRef<Input>(null);
-  const messageRef = React.useRef<TextArea>(null);
-  const authorRef = React.useRef<Input>(null);
-  const urlRef = React.useRef<Input>(null);
+  const titleRef = useRef<Input>(null);
+  const messageRef = useRef<TextArea>(null);
+  const authorRef = useRef<Input>(null);
+  const urlRef = useRef<Input>(null);
 
   useEffect(() => {
     getBooks();
@@ -41,8 +41,16 @@ const Add: React.FC<AddProps> = ({
     }
   }, [error, logout]);
 
-  if (books === null) {
+  if (book === null) {
     return null;
+  }
+
+  if (book === undefined) {
+    return (
+      <div>
+        <h1>NotFound Book</h1>
+      </div>
+    );
   }
 
   return (
@@ -51,10 +59,10 @@ const Add: React.FC<AddProps> = ({
         onBack={back}
         title={
           <div>
-            <FormOutlined /> Add Book
+            <FormOutlined /> Edit Book
           </div>
         }
-        subTitle="Add Your Book"
+        subTitle="Edit Your Book"
         extra={[
           <Button
             key="1"
@@ -69,13 +77,18 @@ const Add: React.FC<AddProps> = ({
 
       <img src="/bg_list.png" className={styles.bg} alt="books" />
 
-      <div className={styles.add}>
+      <div className={styles.edit}>
         <div className={styles.input_title}>
           Title
           <span className={styles.required}> *</span>
         </div>
         <div className={styles.input_area}>
-          <Input placeholder="Title" ref={titleRef} className={styles.input} />
+          <Input
+            placeholder="Title"
+            ref={titleRef}
+            defaultValue={book?.title || ""}
+            className={styles.input}
+          />
         </div>
         <div className={styles.input_comment}>
           Comment
@@ -86,26 +99,28 @@ const Add: React.FC<AddProps> = ({
             rows={4}
             placeholder="Comment"
             ref={messageRef}
+            defaultValue={book?.message || ""}
             className={styles.input}
+            style={{ minHeight: 100 }}
           />
         </div>
-        <div className={styles.input_author}>
-          Author
-          <span className={styles.required}> *</span>
-        </div>
+        <div className={styles.input_author}>Author</div>
         <div className={styles.input_area}>
           <Input
             placeholder="Author"
             ref={authorRef}
+            defaultValue={book?.author || ""}
             className={styles.input}
           />
         </div>
-        <div className={styles.input_url}>
-          URL
-          <span className={styles.required}> *</span>
-        </div>
+        <div className={styles.input_url}>URL</div>
         <div className={styles.input_area}>
-          <Input placeholder="URL" ref={urlRef} className={styles.input} />
+          <Input
+            placeholder="URL"
+            ref={urlRef}
+            defaultValue={book?.url || ""}
+            className={styles.input}
+          />
         </div>
         <div className={styles.button_area}>
           <Button
@@ -114,7 +129,7 @@ const Add: React.FC<AddProps> = ({
             onClick={click}
             className={styles.button}
           >
-            Add
+            Update
           </Button>
         </div>
       </div>
@@ -136,7 +151,7 @@ const Add: React.FC<AddProps> = ({
       messageDialog.error("Please fill out all inputs");
       return;
     }
-    add({
+    edit({
       title,
       message,
       author,
@@ -144,4 +159,4 @@ const Add: React.FC<AddProps> = ({
     });
   }
 };
-export default Add;
+export default Edit;

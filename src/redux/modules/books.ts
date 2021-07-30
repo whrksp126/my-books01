@@ -1,8 +1,17 @@
 import { push } from "connected-react-router";
-import { Action, createActions, handleActions } from "redux-actions";
-import { call, put, select, takeEvery, takeLatest } from "redux-saga/effects";
+import { AnyAction } from "redux";
+import { call, put, select, takeEvery } from "redux-saga/effects";
+import { createActions, handleActions } from "redux-actions";
+
 import BookService from "../../services/BookService";
-import { BookReqType, BooksState, BookType } from "../../types";
+import { BookResType, BookReqType } from "../../types";
+import { getBooksFromState, getTokenFromState } from "../utils";
+
+export interface BooksState {
+  books: BookResType[] | null;
+  loading: boolean;
+  error: Error | null;
+}
 
 const initialState: BooksState = {
   // 초기값
@@ -11,62 +20,81 @@ const initialState: BooksState = {
   error: null,
 };
 
-const prefix = "my-books/books";
+const options = {
+  prefix: "my-books/books",
+};
 
 export const { pending, success, fail } = createActions(
+  { SUCCESS: (books) => ({ books }) },
   "PENDING",
-  "SUCCESS",
   "FAIL",
-  { prefix }
+  options
 );
 
-const reducer = handleActions<BooksState, BookType[]>(
+const reducer = handleActions<BooksState, any>(
   {
-    PENDING: (state) => ({ ...state, loading: true, error: null }),
+    PENDING: (state, action) => ({ ...state, loading: true, error: null }),
     SUCCESS: (state, action) => ({
-      books: action.payload,
+      books: action.payload.books,
       loading: false,
       error: null,
     }),
-    FAIL: (state, action: any) => ({
+    FAIL: (state, action) => ({
       ...state,
       loading: false,
       error: action.payload,
     }),
   },
   initialState,
-  { prefix }
+  options
 );
 
 export default reducer;
 
 // saga
 
-export const { getBooks, addBook } = createActions("GET_BOOKS", "ADD_BOOK", {
-  prefix,
-});
+export const { getBooks, addBook, deleteBook, editBook } = createActions(
+  {
+    ADD_BOOK: (book: BookReqType) => ({
+      book,
+    }),
+    EDIT_BOOK: (bookId: number, book: BookReqType) => ({
+      bookId,
+      book,
+    }),
+    DELETE_BOOK: (bookId: string) => ({ bookId }),
+  },
+  "GET_BOOKS",
+  options
+);
 
-export function* getBooksSaga() {
+function* getBooksSaga() {
   try {
     yield put(pending());
     const token: string = yield select((state) => state.auth.token);
-    const books: BookType[] = yield call(BookService.getBooks, token);
+    const books: BookResType[] = yield call(BookService.getBooks, token);
     yield put(success(books));
   } catch (error) {
     yield put(fail(new Error(error?.response?.data?.error || "UNKNOWN_ERROR")));
   }
 }
 
-function* addBookSaga(action: Action<BookReqType>) {
+interface AddBookSagaAction extends AnyAction {
+  payload: {
+    book: BookReqType;
+  };
+}
+
+function* addBookSaga(action: AddBookSagaAction) {
   try {
     yield put(pending());
-    const token: string = yield select((state) => state.auth.token);
-    const book: BookType = yield call(
+    const token: string = yield select(getTokenFromState);
+    const book: BookResType = yield call(
       BookService.addBook,
       token,
-      action.payload
+      action.payload.book
     );
-    const books: BookType[] = yield select((state) => state.books.books);
+    const books: BookResType[] = yield select(getBooksFromState);
     yield put(success([...books, book]));
     yield put(push("/"));
   } catch (error) {
@@ -74,7 +102,55 @@ function* addBookSaga(action: Action<BookReqType>) {
   }
 }
 
-export function* booksSaga() {
-  yield takeLatest(`${prefix}/GET_BOOKS`, getBooksSaga);
-  yield takeEvery(`${prefix}/ADD_BOOKS`, addBookSaga);
+interface EditBookSagaAction extends AnyAction {
+  payload: {
+    bookId: number;
+    book: BookReqType;
+  };
+}
+function* editBookSaga(action: EditBookSagaAction) {
+  try {
+    yield put(pending());
+    const token: string = yield select(getTokenFromState);
+    const newBook: BookResType = yield call(
+      BookService.editBook,
+      token,
+      action.payload.bookId,
+      action.payload.book
+    );
+    const books: BookResType[] = yield select(getBooksFromState);
+    yield put(
+      success(
+        books.map((book) => (book.bookId === newBook.bookId ? newBook : book))
+      )
+    );
+    yield put(push("/"));
+  } catch (error) {
+    yield put(fail(new Error(error?.response?.data?.error || "UNKNOWN_ERROR")));
+  }
+}
+
+interface DeleteBookSagaAction extends AnyAction {
+  payload: {
+    bookId: number;
+  };
+}
+function* deleteBookSaga(action: DeleteBookSagaAction) {
+  try {
+    const { bookId } = action.payload;
+    yield put(pending());
+    const token: string = yield select(getTokenFromState);
+    yield call(BookService.deleteBook, token, bookId);
+    const books: BookResType[] = yield select(getBooksFromState);
+    yield put(success(books.filter((book) => book.bookId !== bookId)));
+  } catch (error) {
+    yield put(fail(new Error(error?.response?.data?.error || "UNKNOWN_ERROR")));
+  }
+}
+
+export function* sagas() {
+  yield takeEvery(`${options.prefix}/GET_BOOKS`, getBooksSaga);
+  yield takeEvery(`${options.prefix}/ADD_BOOK`, addBookSaga);
+  yield takeEvery(`${options.prefix}/DELETE_BOOK`, deleteBookSaga);
+  yield takeEvery(`${options.prefix}/EDIT_BOOK`, editBookSaga);
 }

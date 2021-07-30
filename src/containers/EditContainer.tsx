@@ -1,21 +1,23 @@
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import { goBack } from "connected-react-router";
 
-import Add from "../components/Add";
+import Edit from "../components/Edit";
 import { RootState } from "../redux/modules/rootReducer";
+import { BookResType } from "../types";
 import { logout as logoutSaga } from "../redux/modules/auth";
-import { BookReqType, BookResType } from "../types";
 import {
-  addBook as addBookSaga,
+  editBook as editBookSaga,
   getBooks as getBooksSaga,
 } from "../redux/modules/books";
 
-const AddContainer = () => {
+const EditContainer = () => {
+  const { id } = useParams();
+  const bookId = Number(id) || -1;
   const books = useSelector<RootState, BookResType[] | null>(
     (state) => state.books.books
   );
-
   const loading = useSelector<RootState, boolean>(
     (state) => state.books.loading
   );
@@ -28,6 +30,13 @@ const AddContainer = () => {
     dispatch(getBooksSaga());
   }, [dispatch]);
 
+  const edit = useCallback(
+    (book) => {
+      dispatch(editBookSaga(bookId, book));
+    },
+    [dispatch, bookId]
+  );
+
   const back = useCallback(() => {
     dispatch(goBack());
   }, [dispatch]);
@@ -36,19 +45,14 @@ const AddContainer = () => {
     dispatch(logoutSaga());
   }, [dispatch]);
 
-  const add = useCallback(
-    (book: BookReqType) => {
-      dispatch(addBookSaga(book));
-    },
-    [dispatch]
-  );
-
   return (
-    <Add
-      books={books}
+    <Edit
+      book={
+        books === null ? null : books.find((book) => book.bookId === bookId)
+      }
       loading={loading}
       error={error}
-      add={add}
+      edit={edit}
       getBooks={getBooks}
       back={back}
       logout={logout}
@@ -56,4 +60,4 @@ const AddContainer = () => {
   );
 };
 
-export default AddContainer;
+export default EditContainer;

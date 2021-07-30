@@ -1,5 +1,5 @@
 import React from "react";
-import { ErrorBoundary } from "react-error-boundary";
+import ErrorBoundary from "react-error-boundary";
 import { Route, Switch } from "react-router-dom";
 import Add from "./pages/Add";
 import Detail from "./pages/Detail";
@@ -9,23 +9,21 @@ import NotFound from "./pages/NotFound";
 import Signin from "./pages/Signin";
 import Error from "./pages/Error";
 import { ConnectedRouter } from "connected-react-router";
-import history from "./history";
+import { history } from "./redux/create";
 
-function App() {
-  return (
-    <ErrorBoundary FallbackComponent={Error}>
-      <ConnectedRouter history={history}>
-        <Switch>
-          <Route exact path="/edit/:id" component={Edit} />
-          <Route exact path="/book/:id" component={Detail} />
-          <Route exact path="/add" component={Add} />
-          <Route exact path="/signin" component={Signin} />
-          <Route exact path="/" component={Home} />
-          <Route component={NotFound} />
-        </Switch>
-      </ConnectedRouter>
-    </ErrorBoundary>
-  );
-}
+const App = () => (
+  <ErrorBoundary FallbackComponent={Error}>
+    <ConnectedRouter history={history}>
+      <Switch>
+        <Route exact path="/edit/:id" component={Edit} />
+        <Route exact path="/book/:id" component={Detail} />
+        <Route exact path="/add" component={Add} />
+        <Route exact path="/signin" component={Signin} />
+        <Route exact path="/" component={Home} />
+        <Route component={NotFound} />
+      </Switch>
+    </ConnectedRouter>
+  </ErrorBoundary>
+);
 
 export default App;

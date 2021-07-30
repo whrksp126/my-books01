@@ -1,11 +1,13 @@
-import { Button, Col, Input, Row } from "antd";
-import React, { useRef } from "react";
+import { Button, Col, Input, message, Row } from "antd";
+import React, { useEffect, useRef } from "react";
 import styles from "./Signin.module.css";
 import { LoginReqType } from "../types";
 
 // lognin 함수를 props로 넣어주기 전에 lognin 함수 모습이 어떤지 정의해야함
 interface SigninProps {
-  login: (reqData: LoginReqType) => void;
+  loading: boolean;
+  error: Error | null;
+  login: ({ email, password }: LoginReqType) => void;
 }
 
 // SigninProps 를 SigninComponent 에 Props 로 설정 하려면
@@ -13,11 +15,26 @@ interface SigninProps {
 // 거기에 Generics 으로 위에서 타이핑한 SigninProps 지정 합니다
 // Signin 에 함수를 만들어서 넣는 것임
 // 이것을 export default 하면 됨
-const Signin: React.FC<SigninProps> = ({ login }) => {
+const Signin: React.FC<SigninProps> = ({ loading, login, error }) => {
   //   ref 의 대상이 되는 것 ↓↓ (Generics 으로 input 이라고 하는 antd 의 컴포넌트 타입을 넣음)
-  const emailRef = useRef<Input>(null);
+  const emailRef = React.useRef<Input>(null);
   // 인자로 아무것도 안넣으면  undefind 가 출력되어 type error 가 생김
-  const passwordRef = useRef<Input>(null);
+  const passwordRef = React.useRef<Input>(null);
+
+  useEffect(() => {
+    if (error === null) return;
+
+    switch (error.message) {
+      case "USER_NOT_EXIST":
+        message.error("User not exist");
+        break;
+      case "PASSWORD_NOT_MATCH":
+        message.error("Wrong password");
+        break;
+      default:
+        message.error("Unknown error occured");
+    }
+  }, [error]);
 
   return (
     <Row align="middle" className={styles.signin_row}>

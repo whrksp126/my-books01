@@ -4,10 +4,20 @@
 
 import { call, put, select, takeEvery } from "@redux-saga/core/effects";
 import { push } from "connected-react-router";
-import { Action, createActions, handleActions } from "redux-actions";
+import { AnyAction } from "redux";
+import { createActions, handleActions } from "redux-actions";
 import TokenService from "../../services/TokenService";
 import UserService from "../../services/UserService";
-import { AuthState, LoginReqType } from "../../types";
+import { LoginReqType } from "../../types";
+
+import { getTokenFromState } from "../utils";
+import { success as booksSuccess } from "./books";
+
+export interface AuthState {
+  token: string | null;
+  loading: boolean;
+  error: Error | null;
+}
 
 const initialState: AuthState = {
   // 초기값 지정
@@ -17,22 +27,25 @@ const initialState: AuthState = {
 };
 
 // 이 모듈에서 prefix를 설정해 둬야함
-const prefix = "my-books/auth";
-
+const options = {
+  prefix: "my-books/auth",
+};
 // createAtcions를 이용해서 action생성 함수를 만듬
 //                ↓↓       ↓↓     ↓↓   createActions로 만들어 진 함수들
 export const { pending, success, fail } = createActions(
   // 액션의 타입을 지정
+  {
+    SUCCESS: (token: string) => ({ token }),
+  },
   "PENDING",
-  "SUCCESS",
   "FAIL",
   // 앞의 각 타입 앞에  my-books/auth 가 자동을 붙음
-  { prefix }
+  options
 );
 
 // reducer만들기
 //           제네릭으로 AuthState ↓↓    ,   ↓↓ payload의 타입
-const reducer = handleActions<AuthState, string>(
+const reducer = handleActions<AuthState, any>(
   // reducer의 첫번째 인자
   {
     // 객체가 들어가는데 action에 type을 바탕으로 reducer 로직이 만들어짐
@@ -46,27 +59,41 @@ const reducer = handleActions<AuthState, string>(
     // 성공한 경우에 token을 받아서 token을 넣어야함
     SUCCESS: (state, action) => ({
       // action의 payload로 token이 들어옴
-      token: action.payload,
+      ...state,
+      token: action.payload.token,
       loading: false,
       error: null,
     }),
     // 실패한 경우
-    FAIL: (state, action: any) => ({
+    FAIL: (state, action) => ({
       ...state,
       loading: false,
       error: action.payload,
     }),
   },
   initialState,
-  { prefix }
+  options
 );
 
 export default reducer;
 
 // saga
-export const { login, logout } = createActions("LOGIN", "LOGOUT", { prefix });
+export const { login, logout } = createActions(
+  {
+    LOGIN: ({ email, password }: LoginReqType) => ({
+      email,
+      password,
+    }),
+  },
+  "LOGOUT",
+  options
+);
 
-function* loginSaga(action: Action<LoginReqType>) {
+interface LoginSagaAction extends AnyAction {
+  payload: LoginReqType;
+}
+
+function* loginSaga(action: LoginSagaAction) {
   try {
     yield put(pending());
     const token: string = yield call(UserService.login, action.payload);
@@ -80,10 +107,10 @@ function* loginSaga(action: Action<LoginReqType>) {
 
 function* logoutSaga() {
   try {
+    yield put(booksSuccess(null));
     yield put(pending());
-    const token: string = yield select((state) => state.auth.token);
+    const token: string = yield select(getTokenFromState);
     yield call(UserService.logout, token);
-    TokenService.set(token);
   } catch (error) {
   } finally {
     TokenService.remove();
@@ -91,7 +118,7 @@ function* logoutSaga() {
   }
 }
 
-export function* authSaga() {
-  yield takeEvery(`${prefix}/LOGIN`, loginSaga);
-  yield takeEvery(`${prefix}/LOGOUT`, logoutSaga);
+export function* sagas() {
+  yield takeEvery(`${options.prefix}/LOGIN`, loginSaga);
+  yield takeEvery(`${options.prefix}/LOGOUT`, logoutSaga);
 }

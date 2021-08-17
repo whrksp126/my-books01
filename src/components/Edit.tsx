@@ -59,7 +59,7 @@ const Edit: React.FC<EditProps> = ({
         onBack={back}
         title={
           <div>
-            <FormOutlined /> Edit Book
+            <FormOutlined /> 수정
           </div>
         }
         subTitle="Edit Your Book"
@@ -70,7 +70,7 @@ const Edit: React.FC<EditProps> = ({
             onClick={logout}
             className={styles.button_logout}
           >
-            Logout
+            로그아웃
           </Button>,
         ]}
       />
@@ -79,7 +79,7 @@ const Edit: React.FC<EditProps> = ({
 
       <div className={styles.edit}>
         <div className={styles.input_title}>
-          Title
+           책 제목
           <span className={styles.required}> *</span>
         </div>
         <div className={styles.input_area}>
@@ -91,7 +91,7 @@ const Edit: React.FC<EditProps> = ({
           />
         </div>
         <div className={styles.input_comment}>
-          Comment
+          감상평
           <span className={styles.required}> *</span>
         </div>
         <div className={styles.input_area}>
@@ -104,7 +104,7 @@ const Edit: React.FC<EditProps> = ({
             style={{ minHeight: 100 }}
           />
         </div>
-        <div className={styles.input_author}>Author</div>
+        <div className={styles.input_author}>작가</div>
         <div className={styles.input_area}>
           <Input
             placeholder="Author"
@@ -113,7 +113,7 @@ const Edit: React.FC<EditProps> = ({
             className={styles.input}
           />
         </div>
-        <div className={styles.input_url}>URL</div>
+        <div className={styles.input_url}>상세페이지 URL</div>
         <div className={styles.input_area}>
           <Input
             placeholder="URL"
@@ -129,7 +129,7 @@ const Edit: React.FC<EditProps> = ({
             onClick={click}
             className={styles.button}
           >
-            Update
+            저장
           </Button>
         </div>
       </div>

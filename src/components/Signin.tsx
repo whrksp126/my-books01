@@ -49,11 +49,13 @@ const Signin: React.FC<SigninProps> = ({ loading, login, error }) => {
           </Col>
           <Col span={12}>
             <div className={styles.signin_title}>My Books</div>
-            <div className={styles.signin_subtilte}>
-              Plese Note Your Opinion
+            <div className={styles.signin_subtitle}>
+              Email : mark@test.com
+              <br/>
+              Password : fastcampus
             </div>
             <div className={styles.signin_underline} />
-            <div className={styles.email_tilte}>
+            <div className={styles.email_title}>
               Email
               <span className={styles.required}> *</span>
             </div>
@@ -67,12 +69,13 @@ const Signin: React.FC<SigninProps> = ({ loading, login, error }) => {
               />
             </div>
 
-            <div className={styles.password_tilte}>
+            <div className={styles.password_title}>
               Password
               <span className={styles.required}> *</span>
             </div>
             <div className={styles.input_area}>
               <Input
+                placeholder="Password"
                 type="password"
                 autoComplete="current-password"
                 className={styles.input}

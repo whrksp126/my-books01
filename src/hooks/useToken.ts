@@ -1,10 +1,10 @@
-import { useSelector } from "react-redux";
+import { useSelector } from 'react-redux';
 
-import { RootState } from "../redux/modules/rootReducer";
+import { RootState } from '../redux/modules/rootReducer';
 
 export default function useToken() {
   const token = useSelector<RootState, string | null>(
-    (state) => state.auth.token
+    (state) => state.auth.token,
   );
 
   return token;

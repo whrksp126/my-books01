@@ -51,7 +51,7 @@ const Add: React.FC<AddProps> = ({
         onBack={back}
         title={
           <div>
-            <FormOutlined /> Add Book
+            <FormOutlined /> 책 추가
           </div>
         }
         subTitle="Add Your Book"
@@ -62,7 +62,7 @@ const Add: React.FC<AddProps> = ({
             onClick={logout}
             className={styles.button_logout}
           >
-            Logout
+            로그아웃
           </Button>,
         ]}
       />
@@ -71,14 +71,14 @@ const Add: React.FC<AddProps> = ({
 
       <div className={styles.add}>
         <div className={styles.input_title}>
-          Title
+          제목
           <span className={styles.required}> *</span>
         </div>
         <div className={styles.input_area}>
           <Input placeholder="Title" ref={titleRef} className={styles.input} />
         </div>
         <div className={styles.input_comment}>
-          Comment
+          감상평
           <span className={styles.required}> *</span>
         </div>
         <div className={styles.input_area}>
@@ -90,7 +90,7 @@ const Add: React.FC<AddProps> = ({
           />
         </div>
         <div className={styles.input_author}>
-          Author
+          작가
           <span className={styles.required}> *</span>
         </div>
         <div className={styles.input_area}>
@@ -101,7 +101,7 @@ const Add: React.FC<AddProps> = ({
           />
         </div>
         <div className={styles.input_url}>
-          URL
+          상세페이지 URL
           <span className={styles.required}> *</span>
         </div>
         <div className={styles.input_area}>
@@ -114,7 +114,7 @@ const Add: React.FC<AddProps> = ({
             onClick={click}
             className={styles.button}
           >
-            Add
+            추가
           </Button>
         </div>
       </div>

@@ -28,7 +28,7 @@ const initialState: AuthState = {
 
 // 이 모듈에서 prefix를 설정해 둬야함
 const options = {
-  prefix: "my-books/auth",
+  prefix: 'my-books/auth',
 };
 // createAtcions를 이용해서 action생성 함수를 만듬
 //                ↓↓       ↓↓     ↓↓   createActions로 만들어 진 함수들
@@ -37,10 +37,10 @@ export const { pending, success, fail } = createActions(
   {
     SUCCESS: (token: string) => ({ token }),
   },
-  "PENDING",
-  "FAIL",
+  'PENDING',
+  'FAIL',
   // 앞의 각 타입 앞에  my-books/auth 가 자동을 붙음
-  options
+  options,
 );
 
 // reducer만들기
@@ -72,7 +72,7 @@ const reducer = handleActions<AuthState, any>(
     }),
   },
   initialState,
-  options
+  options,
 );
 
 export default reducer;
@@ -85,13 +85,19 @@ export const { login, logout } = createActions(
       password,
     }),
   },
-  "LOGOUT",
-  options
+  'LOGOUT',
+  options,
 );
+
+export function* sagas() {
+  yield takeEvery(`${options.prefix}/LOGIN`, loginSaga);
+  yield takeEvery(`${options.prefix}/LOGOUT`, logoutSaga);
+}
 
 interface LoginSagaAction extends AnyAction {
   payload: LoginReqType;
 }
+
 
 function* loginSaga(action: LoginSagaAction) {
   try {
@@ -99,9 +105,9 @@ function* loginSaga(action: LoginSagaAction) {
     const token: string = yield call(UserService.login, action.payload);
     TokenService.set(token);
     yield put(success(token));
-    yield put(push("/"));
+    yield put(push('/'));
   } catch (error) {
-    yield put(fail(new Error(error?.response?.data?.error || "UNKNOWN_ERROR")));
+    yield put(fail(new Error(error?.response?.data?.error || 'UNKNOWN_ERROR')));
   }
 }
 
@@ -116,9 +122,4 @@ function* logoutSaga() {
     TokenService.remove();
     yield put(success(null));
   }
-}
-
-export function* sagas() {
-  yield takeEvery(`${options.prefix}/LOGIN`, loginSaga);
-  yield takeEvery(`${options.prefix}/LOGOUT`, logoutSaga);
 }

@@ -1,28 +1,28 @@
-import React, { useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import { goBack } from "connected-react-router";
+import React, { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { goBack } from 'connected-react-router';
 
-import Edit from "../components/Edit";
-import { RootState } from "../redux/modules/rootReducer";
-import { BookResType } from "../types";
-import { logout as logoutSaga } from "../redux/modules/auth";
+import Edit from '../components/Edit';
+import { RootState } from '../redux/modules/rootReducer';
+import { BookResType } from '../types';
+import { logout as logoutSaga } from '../redux/modules/auth';
 import {
   editBook as editBookSaga,
   getBooks as getBooksSaga,
-} from "../redux/modules/books";
+} from '../redux/modules/books';
 
 const EditContainer = () => {
   const { id } = useParams();
   const bookId = Number(id) || -1;
   const books = useSelector<RootState, BookResType[] | null>(
-    (state) => state.books.books
+    (state) => state.books.books,
   );
   const loading = useSelector<RootState, boolean>(
-    (state) => state.books.loading
+    (state) => state.books.loading,
   );
   const error = useSelector<RootState, Error | null>(
-    (state) => state.books.error
+    (state) => state.books.error,
   );
   const dispatch = useDispatch();
 
@@ -34,7 +34,7 @@ const EditContainer = () => {
     (book) => {
       dispatch(editBookSaga(bookId, book));
     },
-    [dispatch, bookId]
+    [dispatch, bookId],
   );
 
   const back = useCallback(() => {

@@ -1,10 +1,10 @@
-import { useEffect } from "react";
-import { Button, PageHeader, Table } from "antd";
+import React, { useEffect } from 'react';
+import { Table, PageHeader, Button } from 'antd';
 
-import styles from "./List.module.css";
-import Layout from "./Layout";
-import { BookResType } from "../types";
-import Book from "./Book";
+import styles from './List.module.css';
+import Layout from './Layout';
+import { BookResType } from '../types';
+import Book from './Book';
 
 interface BooksProps {
   books: BookResType[] | null;
@@ -40,7 +40,7 @@ const Books: React.FC<BooksProps> = ({
   return (
     <Layout>
       <PageHeader
-        title={<div>Book List</div>}
+        title={<div>읽은 책 목록</div>}
         extra={[
           <Button
             key="2"
@@ -48,7 +48,7 @@ const Books: React.FC<BooksProps> = ({
             onClick={goAdd}
             className={styles.button}
           >
-            Add Book
+            책 추가
           </Button>,
           <Button
             key="1"
@@ -56,18 +56,18 @@ const Books: React.FC<BooksProps> = ({
             onClick={logout}
             className={styles.button}
           >
-            Logout
+            로그아웃
           </Button>,
         ]}
       />
-      <img src="/bg_list.png" style={{ width: "100%" }} alt="books" />
+      <img src="/bg_list.png" style={{ width: '100%' }} alt="books" />
       <Table
         dataSource={books || []}
         columns={[
           {
-            title: "Book",
-            dataIndex: "book",
-            key: "book",
+            title: 'Book',
+            dataIndex: 'book',
+            key: 'book',
             render: (text, record) => (
               <Book
                 {...record}

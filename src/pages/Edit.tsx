@@ -1,9 +1,15 @@
-import React from "react";
+import React from 'react';
+import { Redirect } from 'react-router-dom';
 
-export default function Edit() {
-  return (
-    <div>
-      <h1>Edit</h1>
-    </div>
-  );
-}
+import useToken from '../hooks/useToken';
+import EditContainer from '../containers/EditContainer';
+
+const Edit = () => {
+  const token = useToken();
+  if (token === null) {
+    return <Redirect to="/signin" />;
+  }
+  return <EditContainer />;
+};
+
+export default Edit;

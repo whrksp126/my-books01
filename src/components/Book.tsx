@@ -39,7 +39,7 @@ const Book: React.FC<BookProps> = React.memo(
           {moment(createdAt).format("MM-DD-YYY hh:mm a")}
         </div>
         <div className={styles.tooltips}>
-          <Tooltip title={url}>
+          <Tooltip title= {'상세페이지'}>
             <a
               href={url}
               target="_BLANK"
@@ -55,7 +55,7 @@ const Book: React.FC<BookProps> = React.memo(
               />
             </a>
           </Tooltip>
-          <Tooltip title="Edit">
+          <Tooltip title="수정">
             <Button
               size="small"
               shape="circle"
@@ -64,7 +64,7 @@ const Book: React.FC<BookProps> = React.memo(
               className={styles.button_edit}
             />
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip title="지우기">
             <Button
               size="small"
               type="primary"

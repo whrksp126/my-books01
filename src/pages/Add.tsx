@@ -1,13 +1,15 @@
-import { Redirect } from "react-router";
-import AddContainer from "../containers/AddContainer";
-import useToken from "../hooks/useToken";
+import React from 'react';
+import { Redirect } from 'react-router-dom';
 
-export default function Add() {
+import useToken from '../hooks/useToken';
+import AddContainer from '../containers/AddContainer';
+
+const Add = () => {
   const token = useToken();
-
   if (token === null) {
     return <Redirect to="/signin" />;
   }
-
   return <AddContainer />;
-}
+};
+
+export default Add;
